@@ -158,6 +158,7 @@ class Redis implements AuthorizationCodeInterface,
     // Зарегистрировать клиента с учётом scopes
     public function registerClient($client_id, $client_secret, $redirect_uri, $scopes=null)
     {
+        // Если переданы контексты для клиента, то надо зарегистрировать их в базе:
         if( isset($scopes) )
         {
             $this->setValue(
