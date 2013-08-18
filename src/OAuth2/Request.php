@@ -61,6 +61,8 @@ class Request implements RequestInterface
         $this->server = $server;
         $this->content = $content;
         $this->headers = is_null($headers) ? $this->getHeadersFromServer($this->server) : $headers;
+        //echo 'headers:'.(is_null($headers)==true ? "true" : "false");
+        //print_r($this->getHeadersFromServer($this->server));
     }
 
     public function query($name, $default = null)

@@ -3,6 +3,7 @@
 namespace OAuth2;
 
 use OAuth2\Storage\Memory;
+//use OAuth2\Storage\Redis;
 use OAuth2\Storage\ScopeInterface as ScopeStorageInterface;
 
 /**
@@ -19,7 +20,11 @@ class Scope implements ScopeInterface
     public function __construct($storage = null)
     {
         if (is_null($storage) || is_array($storage)) {
-            $storage = new Memory((array) $storage);
+            //$storage = new Memory((array) $storage);
+            // По-умолчанию соединеняться с базой данных redis, т.к. в Memory нет того, что интересно.
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1');
+            $storage = new Storage\Redis($redis, array());
         }
 
         if (!$storage instanceof ScopeStorageInterface) {

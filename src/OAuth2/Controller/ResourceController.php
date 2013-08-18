@@ -66,7 +66,6 @@ class ResourceController implements ResourceControllerInterface
 
         // allow retrieval of the token
         $this->token = $token;
-
         return (bool) $token;
     }
 

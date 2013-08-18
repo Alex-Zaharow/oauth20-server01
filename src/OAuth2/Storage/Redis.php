@@ -16,7 +16,8 @@ class Redis implements AuthorizationCodeInterface,
     ClientCredentialsInterface,
     UserCredentialsInterface,
     RefreshTokenInterface,
-    JwtBearerInterface
+    JwtBearerInterface,
+    ScopeInterface
 {
     private $redis;
     private $config;
@@ -38,6 +39,8 @@ class Redis implements AuthorizationCodeInterface,
             'code_key' => 'oauth_authorization_codes:',
             'user_key' => 'oauth_users:',
             'jwt_key' => 'oauth_jwt:',
+            'client_supported_scopes' => 'oauth_client_scopes:',
+            'supported_scopes' => 'oauth_scopes:',
         ), $config);
     }
 
@@ -69,7 +72,7 @@ class Redis implements AuthorizationCodeInterface,
     protected function expireValue($key)
     {
         unset($this->cache[$key]);
-        return $this->redis->expire($key);
+        return $this->redis->expire($key, 0);
     }
 
     /* AuthorizationCodeInterface */
@@ -152,8 +155,16 @@ class Redis implements AuthorizationCodeInterface,
         return true;
     }
 
-    public function registerClient($client_id, $client_secret, $redirect_uri)
+    // Зарегистрировать клиента с учётом scopes
+    public function registerClient($client_id, $client_secret, $redirect_uri, $scopes=null)
     {
+        if( isset($scopes) )
+        {
+            $this->setValue(
+                            $this->config['client_supported_scopes'] . $client_id,
+                            [$scopes]
+                           );
+        }
         return $this->setValue(
             $this->config['client_key'] . $client_id,
             compact('client_id', 'client_secret', 'redirect_uri')
@@ -193,6 +204,17 @@ class Redis implements AuthorizationCodeInterface,
             compact('access_token', 'client_id', 'user_id', 'expires', 'scope'),
             $expires
         );
+    }
+    public function scopeExists($scope, $client_id=null)
+    {
+        $scope = explode(' ', trim($scope) );
+        $supported_scopes = explode(' ', $this->getValue( $this->config['client_supported_scopes'] . $client_id )[0] );
+        return (count(array_diff($scope, $supported_scopes))==0);
+    }
+
+    public function getDefaultScope($client_id=null)
+    {
+        return $this->defaultScope;
     }
 
     /*JWTBearerInterface */

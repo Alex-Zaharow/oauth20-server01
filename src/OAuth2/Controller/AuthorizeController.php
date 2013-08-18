@@ -200,7 +200,8 @@ class AuthorizeController implements AuthorizeControllerInterface
             return false;
         }
 
-        if (!is_null($scope) && !$this->scopeUtil->scopeExists($scope, $client_id)) {
+        //if (!is_null($scope) && !$this->scopeUtil->scopeExists($scope, $client_id)) {
+        if (!is_null($scope) && !$this->clientStorage->scopeExists($scope, $client_id)) {
             $response->setRedirect($this->config['redirect_status_code'], $redirect_uri, $state, 'invalid_scope', 'An unsupported scope was requested', null);
             return false;
         }
