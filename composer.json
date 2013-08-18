@@ -13,6 +13,7 @@
     ],
     "homepage": "http://github.com/bshaffer/oauth2-server-php",
     "require":{
+	bshaffer/oauth2-server-php": "dev-develop",
         "php":">=5.2.0"
     },
     "autoload": {
